@@ -194,7 +194,7 @@ Reps:
 			bookings = append(bookings, Booking{Start: dates[2*b], End: dates[2*b+1]})
 			if b > 0 {
 				if bookings[b].Start.Equal(bookings[b-1].End) {
-					bookings[b].Start = time.Unix(bookings[b].Start.Unix()+1, 0)
+					bookings[b].Start = bookings[b].Start.Add(time.Second)
 				}
 				if bookings[b].Start.After(bookings[b].End) {
 					fmt.Println("have to skip 'TestTrivialBlocks' due to too-close bookings")
