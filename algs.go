@@ -46,7 +46,7 @@ func getblock(e *Event, seed int) (retval Block) {
 	return
 }
 
-func (e *Event) blockify() []Block {
+func (e *Event) Blockify() []Block {
 	blocks := make([]Block, 0)
 
 	seed := 0

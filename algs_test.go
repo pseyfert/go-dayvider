@@ -130,7 +130,7 @@ func TestBlocking(t *testing.T) {
 			fmt.Println("generated event")
 		}
 
-		blocks := event.blockify()
+		blocks := event.Blockify()
 		if testing.Verbose() {
 			fmt.Println("blockified")
 		}
@@ -204,7 +204,7 @@ Reps:
 		}
 		event := NewEvent(bookings)
 
-		blocks := event.blockify()
+		blocks := event.Blockify()
 
 		validateBlocks(blocks, t)
 
@@ -233,7 +233,7 @@ func TestLongBlock(t *testing.T) {
 		}
 		event := NewEvent(bookings)
 
-		blocks := event.blockify()
+		blocks := event.Blockify()
 
 		validateBlocks(blocks, t)
 
