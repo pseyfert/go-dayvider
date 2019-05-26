@@ -96,7 +96,22 @@ func validateBlock(b Block, t *testing.T) {
 		dumpblock(b)
 		t.Fatal("booking end seems excessive")
 	}
-	// todo: validate absence of gaps in a block
+
+	connectedend := b.Event.Bookings[b.Seed].End
+	for i := b.Seed; i < b.Last; i += 1 {
+		if !b.Event.Bookings[i].Start.After(connectedend) &&
+			b.Event.Bookings[i].End.After(connectedend) {
+			connectedend = b.Event.Bookings[i].End
+			i = b.Seed
+		}
+	}
+	if connectedend.Before(b.End) {
+		if testing.Verbose() {
+			fmt.Printf("potential gap starting at %v\n", connectedend)
+			dumpblock(b)
+		}
+		t.Fatal("gap found within block")
+	}
 }
 
 func TestBlocking(t *testing.T) {
