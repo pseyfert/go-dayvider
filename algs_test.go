@@ -78,7 +78,7 @@ func validateBlock(b Block, t *testing.T) {
 		t.Fatal("block starts not aligned")
 	}
 
-	lastend := b.Event.Bookings[0].End
+	lastend := b.Event.Bookings[b.Seed].End
 	for i := b.Seed; i < b.Last; i += 1 {
 		if b.Event.Bookings[i].Start.Before(b.Start) {
 			dumpblock(b)
