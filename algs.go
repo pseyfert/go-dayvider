@@ -25,7 +25,7 @@ func getblock(e *Event, seed int) (retval Block) {
 	retval.End = e.Bookings[seed].End
 	retval.Last = retval.Seed + 1
 
-	for i := range e.Bookings[retval.Seed:len(e.Bookings)] {
+	for i := retval.Seed; i < len(e.Bookings); i += 1 {
 
 		// further bookings might:
 		//  * have ended before the current `end`   -> skip

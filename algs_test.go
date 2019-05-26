@@ -137,7 +137,6 @@ func TestBlocking(t *testing.T) {
 			fmt.Println("passed event")
 		}
 	}
-
 }
 
 var test_repetitions int
