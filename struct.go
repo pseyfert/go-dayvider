@@ -27,6 +27,8 @@ type Event struct {
 	Bookings []Booking // assumed sorted by start time
 }
 
+type times []time.Time
+
 func (e Event) Less(i, j int) bool {
 	return e.Bookings[i].Start.Before(e.Bookings[j].Start)
 }
@@ -41,6 +43,22 @@ func (e Event) Len() int {
 
 func (e Event) Swap(i, j int) {
 	e.Bookings[i], e.Bookings[j] = e.Bookings[j], e.Bookings[i]
+}
+
+func (e times) Less(i, j int) bool {
+	return e[i].Before(e[j])
+}
+
+func (e times) Sort() {
+	sort.Sort(e)
+}
+
+func (e times) Len() int {
+	return len(e)
+}
+
+func (e times) Swap(i, j int) {
+	e[i], e[j] = e[j], e[i]
 }
 
 func NewEvent(bs []Booking) (e Event) {
