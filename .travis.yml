@@ -11,4 +11,11 @@ script:
   # Run go vet for further checking.
   - go vet github.com/pseyfert/go-dayvider
   # Run tests (output validation)
-  - go test github.com/pseyfert/go-dayvider
+  - go test github.com/pseyfert/go-dayvider -bookings 1 -repetitions 5
+  - go test github.com/pseyfert/go-dayvider -bookings 2 -repetitions 10
+  - go test github.com/pseyfert/go-dayvider -bookings 3 -repetitions 10
+  - go test github.com/pseyfert/go-dayvider -bookings 4 -repetitions 10
+  - go test github.com/pseyfert/go-dayvider -bookings 5 -repetitions 500
+  - go test github.com/pseyfert/go-dayvider -bookings 10 -repetitions 500
+  - go test github.com/pseyfert/go-dayvider -bookings 100 -repetitions 100
+  - go test github.com/pseyfert/go-dayvider -bookings 1000 -repetitions 20
