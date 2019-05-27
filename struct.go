@@ -49,10 +49,6 @@ func (e times) Less(i, j int) bool {
 	return e[i].Before(e[j])
 }
 
-func (e times) Sort() {
-	sort.Sort(e)
-}
-
 func (e times) Len() int {
 	return len(e)
 }

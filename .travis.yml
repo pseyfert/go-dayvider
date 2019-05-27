@@ -19,3 +19,4 @@ script:
   - go test github.com/pseyfert/go-dayvider -bookings 10 -repetitions 500
   - go test github.com/pseyfert/go-dayvider -bookings 100 -repetitions 100
   - go test github.com/pseyfert/go-dayvider -bookings 1000 -repetitions 20
+  - go test -coverprofile=cover.out -repetitions 500 -bookings 300 -days 2 && go tool cover -html=cover.out -o cover.html

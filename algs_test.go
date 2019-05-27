@@ -40,8 +40,10 @@ func randombooking() Booking {
 
 func randate() time.Time {
 	// modified from https://stackoverflow.com/a/43497333
-	min := time.Date(2000, 1, 0, 0, 0, 0, 0, time.UTC).Unix()
-	max := time.Date(2020, 9, 9, 9, 9, 9, 9, time.UTC).Unix()
+	start := time.Date(2020, 1, 0, 0, 0, 0, 0, time.UTC)
+	end := start.Add(time.Duration(test_days)*24*time.Hour - time.Minute)
+	min := start.Unix()
+	max := end.Unix()
 	delta := max - min
 
 	sec := rand.Int63n(delta) + min
@@ -295,10 +297,12 @@ func TestLongBlock(t *testing.T) {
 
 var test_repetitions int
 var test_bookings int
+var test_days int
 
 func TestMain(m *testing.M) {
 	flag.IntVar(&test_repetitions, "repetitions", 5, "repeat randomized test N times")
 	flag.IntVar(&test_bookings, "bookings", 3, "test with a random event of N bookings")
+	flag.IntVar(&test_days, "days", 3, "test all bookings spread over N days")
 	flag.Parse()
 	// call flag.Parse() here if TestMain uses flags
 	os.Exit(m.Run())

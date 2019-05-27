@@ -120,10 +120,29 @@ func Gaps(durationbookings []Block) (retval []time.Duration) {
 	return
 }
 
-func GapsInBlocks(blocks []Block) []time.Duration {
+func WrapBlocks(blocks []Block) []Block {
 	wd := WrapDurations(blocks)
 	wb := DurationsToBookings(wd)
 	event := NewEvent(wb)
-	wrappedblocks := event.Blockify()
-	return Gaps(wrappedblocks)
+	return event.Blockify()
+}
+
+func longestGap(gaps []time.Duration) int {
+	longestplace := 0
+	longesttime := gaps[0]
+	for i, d := range gaps {
+		if d > longesttime {
+			longesttime = d
+			longestplace = i
+		}
+	}
+	return longestplace
+}
+
+func EndOfFirstDay(blocks []Block) time.Time {
+	wrappedblocks := WrapBlocks(blocks)
+	gaps := Gaps(wrappedblocks)
+	longestgap := longestGap(gaps)
+
+	return wrappedblocks[longestgap].End
 }
