@@ -18,7 +18,10 @@
 
 package dayvider
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 func getblock(e *Event, seed int) (retval Block) {
 	retval.Event = e
@@ -66,7 +69,7 @@ func (e *Event) Blockify() []Block {
 	return blocks
 }
 
-func WrapDurations(blocks []Block) WrappedDuration {
+func wrapDurations(blocks []Block) WrappedDuration {
 	var retval WrappedDuration
 	retval.Ref = blocks[0].Start
 	for _, b := range blocks {
@@ -93,7 +96,7 @@ func WrapDurations(blocks []Block) WrappedDuration {
 	return retval
 }
 
-func DurationsToBookings(wd WrappedDuration) (retval []Booking) {
+func durationsToBookings(wd WrappedDuration) (retval []Booking) {
 	retval = make([]Booking, 0, len(wd.Starts))
 
 	for i := 0; i < len(wd.Starts); i += 1 {
@@ -120,9 +123,9 @@ func Gaps(durationbookings []Block) (retval []time.Duration) {
 	return
 }
 
-func WrapBlocks(blocks []Block) []Block {
-	wd := WrapDurations(blocks)
-	wb := DurationsToBookings(wd)
+func wrapBlocks(blocks []Block) []Block {
+	wd := wrapDurations(blocks)
+	wb := durationsToBookings(wd)
 	event := NewEvent(wb)
 	return event.Blockify()
 }
@@ -139,10 +142,22 @@ func longestGap(gaps []time.Duration) int {
 	return longestplace
 }
 
-func EndOfFirstDay(blocks []Block) time.Time {
-	wrappedblocks := WrapBlocks(blocks)
+func EndOfFirstDay(blocks []Block) (time.Time, error) {
+	wrappedblocks := wrapBlocks(blocks)
+	if impossibleEvent(wrappedblocks) {
+		return time.Time{}, fmt.Errorf("no 24h reoccuring gap in the agenda found")
+	}
 	gaps := Gaps(wrappedblocks)
 	longestgap := longestGap(gaps)
 
-	return wrappedblocks[longestgap].End
+	return wrappedblocks[longestgap].End, nil
+}
+
+func impossibleEvent(bs []Block) bool {
+	for _, b := range bs {
+		if b.End.Sub(b.Start) >= 24*time.Hour {
+			return true
+		}
+	}
+	return false
 }

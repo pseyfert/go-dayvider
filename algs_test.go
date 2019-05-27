@@ -183,10 +183,10 @@ Reps:
 		if testing.Verbose() {
 			fmt.Println("passed event")
 		}
-		wd := WrapDurations(blocks)
+		wd := wrapDurations(blocks)
 		validateWrappedDuration(wd, t)
 
-		wblocks := WrapBlocks(blocks)
+		wblocks := wrapBlocks(blocks)
 		validateBlocks(wblocks, t)
 		if wblocks[len(wblocks)-1].End.Sub(wblocks[0].Start) > 24*time.Hour {
 			t.Fatalf("wrapped blocks span more than 1 day")
@@ -215,7 +215,11 @@ Reps:
 		if longestGap(gaps) >= len(gaps) {
 			t.Fatalf("found impossible last gap")
 		}
-		validateEndOfDay(bookings, EndOfFirstDay(blocks), t)
+		eod, err := EndOfFirstDay(blocks)
+		if err != nil {
+			t.Fatal("impossible event not caught earlier")
+		}
+		validateEndOfDay(bookings, eod, t)
 	}
 }
 
@@ -290,10 +294,10 @@ Reps:
 			}
 			t.Fatalf("should have number of blocks (%d) equal to number of bookings (%d)", len(blocks), len(bookings))
 		}
-		wd := WrapDurations(blocks)
+		wd := wrapDurations(blocks)
 		validateWrappedDuration(wd, t)
 
-		wblocks := WrapBlocks(blocks)
+		wblocks := wrapBlocks(blocks)
 		validateBlocks(wblocks, t)
 		if wblocks[len(wblocks)-1].End.Sub(wblocks[0].Start) > 24*time.Hour {
 			t.Fatalf("wrapped blocks span more than 1 day")
@@ -318,7 +322,11 @@ Reps:
 		if longestGap(gaps) >= len(gaps) {
 			t.Fatalf("found impossible last gap")
 		}
-		validateEndOfDay(bookings, EndOfFirstDay(blocks), t)
+		eod, err := EndOfFirstDay(blocks)
+		if err != nil {
+			t.Fatal("impossible event not caught earlier")
+		}
+		validateEndOfDay(bookings, eod, t)
 	}
 }
 
@@ -350,10 +358,10 @@ Reps:
 			t.Fatalf("should have received only one block rather than %d", len(blocks))
 		}
 
-		wd := WrapDurations(blocks)
+		wd := wrapDurations(blocks)
 		validateWrappedDuration(wd, t)
 
-		wblocks := WrapBlocks(blocks)
+		wblocks := wrapBlocks(blocks)
 		validateBlocks(wblocks, t)
 		if wblocks[len(wblocks)-1].End.Sub(wblocks[0].Start) > 24*time.Hour {
 			t.Fatalf("wrapped blocks span more than 1 day")
@@ -370,17 +378,12 @@ Reps:
 		if longestGap(gaps) >= len(gaps) {
 			t.Fatalf("found impossible last gap")
 		}
-		validateEndOfDay(bookings, EndOfFirstDay(blocks), t)
-	}
-}
-
-func impossibleEvent(bs []Block) bool {
-	for _, b := range bs {
-		if b.End.Sub(b.Start) >= 24*time.Hour {
-			return true
+		eod, err := EndOfFirstDay(blocks)
+		if err != nil {
+			t.Fatal("impossible event not caught earlier")
 		}
+		validateEndOfDay(bookings, eod, t)
 	}
-	return false
 }
 
 func validateEndOfDay(bookings []Booking, endofday time.Time, t *testing.T) {
