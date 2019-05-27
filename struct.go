@@ -82,3 +82,9 @@ type Block struct {
 	Start time.Time
 	End   time.Time
 }
+
+type WrappedDuration struct {
+	Starts []time.Duration
+	Ends   []time.Duration
+	Ref    time.Time
+}

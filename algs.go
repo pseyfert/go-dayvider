@@ -18,6 +18,8 @@
 
 package dayvider
 
+import "time"
+
 func getblock(e *Event, seed int) (retval Block) {
 	retval.Event = e
 	retval.Seed = seed
@@ -62,4 +64,23 @@ func (e *Event) Blockify() []Block {
 	}
 
 	return blocks
+}
+
+func WrapDurations(blocks []Block) WrappedDuration {
+	var retval WrappedDuration
+	retval.Ref = blocks[0].Start
+	for _, b := range blocks {
+		retval.Starts = append(retval.Starts, b.Start.Sub(retval.Ref)%(time.Duration(24)*time.Hour))
+		retval.Ends = append(retval.Ends, b.End.Sub(retval.Ref)%(time.Duration(24)*time.Hour))
+
+		i := len(retval.Starts) - 1
+		if retval.Starts[i] > retval.Ends[i] {
+			tmp := retval.Ends[i]
+			retval.Ends[i] = time.Duration(24) * time.Hour
+			retval.Starts = append(retval.Starts, time.Duration(0))
+			retval.Ends = append(retval.Ends, tmp)
+		}
+	}
+
+	return retval
 }
