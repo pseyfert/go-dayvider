@@ -11,12 +11,17 @@ script:
   # Run go vet for further checking.
   - go vet github.com/pseyfert/go-dayvider
   # Run tests (output validation)
-  - go test github.com/pseyfert/go-dayvider -bookings 1 -repetitions 5
-  - go test github.com/pseyfert/go-dayvider -bookings 2 -repetitions 10
-  - go test github.com/pseyfert/go-dayvider -bookings 3 -repetitions 10
-  - go test github.com/pseyfert/go-dayvider -bookings 4 -repetitions 10
-  - go test github.com/pseyfert/go-dayvider -bookings 5 -repetitions 500
-  - go test github.com/pseyfert/go-dayvider -bookings 10 -repetitions 500
-  - go test github.com/pseyfert/go-dayvider -bookings 100 -repetitions 100
-  - go test github.com/pseyfert/go-dayvider -bookings 1000 -repetitions 20
+  - go test github.com/pseyfert/go-dayvider -bookings 1 -repetitions 5 -days 2
+  - go test github.com/pseyfert/go-dayvider -bookings 2 -repetitions 10 -days 2
+  - go test github.com/pseyfert/go-dayvider -bookings 3 -repetitions 10 -days 2
+  - go test github.com/pseyfert/go-dayvider -bookings 4 -repetitions 10 -days 2
+  - go test github.com/pseyfert/go-dayvider -bookings 5 -repetitions 500 -days 2
+  - go test github.com/pseyfert/go-dayvider -bookings 10 -repetitions 500 -days 2
+  - go test github.com/pseyfert/go-dayvider -bookings 100 -repetitions 100 -days 2
+  - go test github.com/pseyfert/go-dayvider -bookings 1000 -repetitions 20 -days 2
   - go test -coverprofile=cover.out -repetitions 500 -bookings 300 -days 2 && go tool cover -html=cover.out -o cover.html
+
+  - go test github.com/pseyfert/go-dayvider -bookings 4 -repetitions 50 -days 1
+  - go test github.com/pseyfert/go-dayvider -bookings 4 -repetitions 50 -days 3
+  - go test github.com/pseyfert/go-dayvider -bookings 40 -repetitions 50 -days 3
+  - go test github.com/pseyfert/go-dayvider -bookings 4 -repetitions 50 -days 4

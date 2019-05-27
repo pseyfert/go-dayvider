@@ -151,6 +151,7 @@ func validateBlock(b Block, i int, t *testing.T) {
 }
 
 func TestBlocking(t *testing.T) {
+Reps:
 	for e := 0; e < test_repetitions; e += 1 {
 		bookings := make([]Booking, 0, test_bookings)
 		for b := 0; b < test_bookings; b += 1 {
@@ -184,6 +185,37 @@ func TestBlocking(t *testing.T) {
 		}
 		wd := WrapDurations(blocks)
 		validateWrappedDuration(wd, t)
+
+		wblocks := WrapBlocks(blocks)
+		validateBlocks(wblocks, t)
+		if wblocks[len(wblocks)-1].End.Sub(wblocks[0].Start) > 24*time.Hour {
+			t.Fatalf("wrapped blocks span more than 1 day")
+		}
+
+		gaps := Gaps(wblocks)
+
+		if test_days == 1 {
+			if len(gaps) != len(blocks) {
+				t.Fatalf("there should be one gap per block!")
+			}
+		} else {
+			if len(gaps) != len(wblocks) && len(gaps) != len(wblocks)-1 {
+				t.Fatalf("there should be more gaps")
+			}
+		}
+
+		if len(gaps) == 0 {
+			if impossibleEvent(wblocks) {
+				fmt.Printf("skipping impossible event\n")
+				continue Reps
+			} else {
+				t.Fatalf("no gaps. ensure there are gaps")
+			}
+		}
+		if longestGap(gaps) >= len(gaps) {
+			t.Fatalf("found impossible last gap")
+		}
+		validateEndOfDay(bookings, EndOfFirstDay(blocks), t)
 	}
 }
 
@@ -260,10 +292,38 @@ Reps:
 		}
 		wd := WrapDurations(blocks)
 		validateWrappedDuration(wd, t)
+
+		wblocks := WrapBlocks(blocks)
+		validateBlocks(wblocks, t)
+		if wblocks[len(wblocks)-1].End.Sub(wblocks[0].Start) > 24*time.Hour {
+			t.Fatalf("wrapped blocks span more than 1 day")
+		}
+
+		gaps := Gaps(wblocks)
+
+		if test_days == 1 {
+			if len(gaps) != test_bookings {
+				t.Fatalf("there should be one gap per booking!")
+			}
+		}
+
+		if len(gaps) == 0 {
+			if impossibleEvent(wblocks) {
+				fmt.Printf("skipping impossible event\n")
+				continue Reps
+			} else {
+				t.Fatalf("no gaps. ensure there are gaps")
+			}
+		}
+		if longestGap(gaps) >= len(gaps) {
+			t.Fatalf("found impossible last gap")
+		}
+		validateEndOfDay(bookings, EndOfFirstDay(blocks), t)
 	}
 }
 
 func TestLongBlock(t *testing.T) {
+Reps:
 	for e := 0; e < test_repetitions; e += 1 {
 		bookings := make([]Booking, 0, test_bookings)
 
@@ -292,6 +352,45 @@ func TestLongBlock(t *testing.T) {
 
 		wd := WrapDurations(blocks)
 		validateWrappedDuration(wd, t)
+
+		wblocks := WrapBlocks(blocks)
+		validateBlocks(wblocks, t)
+		if wblocks[len(wblocks)-1].End.Sub(wblocks[0].Start) > 24*time.Hour {
+			t.Fatalf("wrapped blocks span more than 1 day")
+		}
+
+		if test_days > 1 {
+			continue Reps
+		}
+
+		gaps := Gaps(wblocks)
+		if len(gaps) != 1 {
+			t.Fatalf("there must be exactly one gap in the long block test")
+		}
+		if longestGap(gaps) >= len(gaps) {
+			t.Fatalf("found impossible last gap")
+		}
+		validateEndOfDay(bookings, EndOfFirstDay(blocks), t)
+	}
+}
+
+func impossibleEvent(bs []Block) bool {
+	for _, b := range bs {
+		if b.End.Sub(b.Start) >= 24*time.Hour {
+			return true
+		}
+	}
+	return false
+}
+
+func validateEndOfDay(bookings []Booking, endofday time.Time, t *testing.T) {
+	for _, b := range bookings {
+		if endofday.After(b.Start) && endofday.Before(b.End) {
+			t.Fatal("found booking during end of day")
+		}
+	}
+	if endofday.Sub(bookings[0].Start) > 24*time.Hour {
+		t.Fatal("first day is longer than 24 hours")
 	}
 }
 
