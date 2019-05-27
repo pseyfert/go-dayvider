@@ -84,3 +84,38 @@ func WrapDurations(blocks []Block) WrappedDuration {
 
 	return retval
 }
+
+func DurationsToBookings(wd WrappedDuration) (retval []Booking) {
+	retval = make([]Booking, 0, len(wd.Starts))
+
+	for i := 0; i < len(wd.Starts); i += 1 {
+		retval = append(retval, Booking{Start: wd.Ref.Add(wd.Starts[i]), End: wd.Ref.Add(wd.Ends[i])})
+	}
+
+	return
+}
+
+func Gaps(durationbookings []Block) (retval []time.Duration) {
+	retval = make([]time.Duration, 0, len(durationbookings))
+
+	for i := 0; i < len(durationbookings)-1; i += 1 {
+		end := durationbookings[i+1].Start
+		start := durationbookings[i].End
+		retval = append(retval, end.Sub(start))
+	}
+	i := len(durationbookings) - 1
+	end := durationbookings[0].Start.Add(24 * time.Hour)
+	if start := durationbookings[i].End; start.Before(end) {
+		retval = append(retval, end.Sub(start))
+	}
+
+	return
+}
+
+func GapsInBlocks(blocks []Block) []time.Duration {
+	wd := WrapDurations(blocks)
+	wb := DurationsToBookings(wd)
+	event := NewEvent(wb)
+	wrappedblocks := event.Blockify()
+	return Gaps(wrappedblocks)
+}

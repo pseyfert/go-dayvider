@@ -62,6 +62,38 @@ func dumpblock(b Block, i int) {
 	}
 }
 
+func dumpwd(wd WrappedDuration) {
+	if testing.Verbose() {
+		for i := 0; i < len(wd.Starts); i += 1 {
+			fmt.Printf("  Duration from %v to %v\n", wd.Starts[i], wd.Ends[i])
+		}
+	}
+}
+
+func validateWrappedDuration(wd WrappedDuration, t *testing.T) {
+	if len(wd.Starts) != len(wd.Ends) {
+		t.Fatal("inconsistend WrappedDuration")
+	}
+	if wd.Starts[0] != time.Duration(0) {
+		dumpwd(wd)
+		t.Fatal("first durations should start at 0")
+	}
+	for i := 0; i < len(wd.Starts); i += 1 {
+		if wd.Starts[i] < time.Duration(0) {
+			dumpwd(wd)
+			t.Fatal("durations should not start before 0")
+		}
+		if wd.Ends[i] < wd.Starts[i] {
+			dumpwd(wd)
+			t.Fatal("duration wrongly ordered")
+		}
+		if wd.Ends[len(wd.Ends)-1] > 24*time.Hour {
+			dumpwd(wd)
+			t.Fatal("times wrap later than 24h")
+		}
+	}
+}
+
 func validateBlock(b Block, i int, t *testing.T) {
 	if b.Last <= b.Seed {
 		dumpblock(b, i)
@@ -148,6 +180,8 @@ func TestBlocking(t *testing.T) {
 		if testing.Verbose() {
 			fmt.Println("passed event")
 		}
+		wd := WrapDurations(blocks)
+		validateWrappedDuration(wd, t)
 	}
 }
 
@@ -175,6 +209,12 @@ func validateBlocks(blocks []Block, t *testing.T) {
 	for i := 1; i < len(blocks); i += 1 {
 		if blocks[i-1].Last != blocks[i].Seed {
 			t.Fatal("not all bookings seem to have ended up in blocks")
+		}
+		if blocks[i].Start.Before(blocks[i-1].Start) {
+			t.Fatal("blocks array doesn't seem to be ordered")
+		}
+		if blocks[i-1].End.After(blocks[i].Start) {
+			t.Fatal("overlapping blocks!")
 		}
 	}
 }
@@ -216,6 +256,8 @@ Reps:
 			}
 			t.Fatalf("should have number of blocks (%d) equal to number of bookings (%d)", len(blocks), len(bookings))
 		}
+		wd := WrapDurations(blocks)
+		validateWrappedDuration(wd, t)
 	}
 }
 
@@ -245,6 +287,9 @@ func TestLongBlock(t *testing.T) {
 			}
 			t.Fatalf("should have received only one block rather than %d", len(blocks))
 		}
+
+		wd := WrapDurations(blocks)
+		validateWrappedDuration(wd, t)
 	}
 }
 
