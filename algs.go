@@ -73,6 +73,14 @@ func WrapDurations(blocks []Block) WrappedDuration {
 		retval.Starts = append(retval.Starts, b.Start.Sub(retval.Ref)%(time.Duration(24)*time.Hour))
 		retval.Ends = append(retval.Ends, b.End.Sub(retval.Ref)%(time.Duration(24)*time.Hour))
 
+		if b.End.Sub(b.Start) > 24*time.Hour {
+			var cornercase WrappedDuration
+			cornercase.Ref = blocks[0].Start
+			cornercase.Starts = []time.Duration{0}
+			cornercase.Ends = []time.Duration{24 * time.Hour}
+			return cornercase
+		}
+
 		i := len(retval.Starts) - 1
 		if retval.Starts[i] > retval.Ends[i] {
 			tmp := retval.Ends[i]
