@@ -59,9 +59,7 @@ func (e times) Swap(i, j int) {
 
 func NewEvent(bs []Booking) (e Event) {
 	e.Bookings = make([]Booking, 0, len(bs))
-	for _, b := range bs {
-		e.Bookings = append(e.Bookings, b)
-	}
+	e.Bookings = append(e.Bookings, bs...)
 	e.Sort()
 	return
 }
